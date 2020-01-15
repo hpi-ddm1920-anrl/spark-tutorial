@@ -438,6 +438,13 @@ object SimpleSpark extends App {
     val inputs = List("region", "nation", "supplier", "customer", "part", "lineitem", "orders")
       .map(name => s"data/TPCH/tpch_$name.csv")
 
+    // Read a TPCH dataset from file
+    val tpch = spark.read
+      .option("inferSchema", "true")
+      .option("header", "true")
+      .csv("data/employees.csv") // also text, json, jdbc, parquet
+      .as[(String, Int, Double, String)]
+
     //time {Sindy.discoverINDs(inputs, spark)}
   }
 }
