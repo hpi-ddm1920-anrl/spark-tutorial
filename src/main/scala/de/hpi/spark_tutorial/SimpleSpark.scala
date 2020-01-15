@@ -24,7 +24,7 @@ object SimpleSpark extends App {
     // Turn off logging
     Logger.getLogger("org").setLevel(Level.OFF)
     Logger.getLogger("akka").setLevel(Level.OFF)
-
+/*
     //------------------------------------------------------------------------------------------------------------------
     // Lamda basics (for Scala)
     //------------------------------------------------------------------------------------------------------------------
@@ -52,7 +52,7 @@ object SimpleSpark extends App {
     println(smallListOfNumbers.map(squareAndAddFunction))
     println(smallListOfNumbers.map(i => i * 2 + 0.5)) // anonymous function; compiler can infers types
     println(smallListOfNumbers.map(_ * 2 + 0.5)) // syntactic sugar: '_' maps to first (second, third, ...) parameter
-
+*/
     //------------------------------------------------------------------------------------------------------------------
     // Setting up a Spark Session
     //------------------------------------------------------------------------------------------------------------------
@@ -71,7 +71,7 @@ object SimpleSpark extends App {
     import spark.implicits._
 
     println("---------------------------------------------------------------------------------------------------------")
-
+/*
     //------------------------------------------------------------------------------------------------------------------
     // Loading data
     //------------------------------------------------------------------------------------------------------------------
@@ -430,21 +430,33 @@ object SimpleSpark extends App {
         .toDF("ID", "Substring")
         .show(200)
     }
-
+*/
     //------------------------------------------------------------------------------------------------------------------
     // Inclusion Dependency Discovery (Homework)
     //------------------------------------------------------------------------------------------------------------------
 
     val inputs = List("region", "nation", "supplier", "customer", "part", "lineitem", "orders")
-      .map(name => s"data/TPCH/tpch_$name.csv")
+               .map(name => s"data/TPCH/tpch_$name.csv")
 
+    inputs.foreach(input =>
+                            spark.read
+                              .option("inferSchema", "true")
+                              .option("header", "true")
+                              .option("sep", ";")
+                              .csv(input)
+                              .show(2,false)
+
+
+    )
     // Read a TPCH dataset from file
-    val tpch = spark.read
-      .option("inferSchema", "true")
-      .option("header", "true")
-      .csv("data/employees.csv") // also text, json, jdbc, parquet
-      .as[(String, Int, Double, String)]
 
+/*
+    tpch.describe()
+    tpch.explain()
+    tpch.printSchema()
+    tpch.p
+
+*/
     //time {Sindy.discoverINDs(inputs, spark)}
   }
 }
