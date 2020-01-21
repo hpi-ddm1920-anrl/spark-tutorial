@@ -1,6 +1,6 @@
 package de.hpi.spark_tutorial
 
-import org.apache.spark.sql.{Dataset, Encoder, SparkSession}
+import org.apache.spark.sql.{Dataset, Encoder, SparkSession, functions}
 import org.apache.spark.ml.Pipeline
 import org.apache.spark.ml.classification.DecisionTreeClassificationModel
 import org.apache.spark.ml.classification.DecisionTreeClassifier
@@ -435,19 +435,42 @@ object SimpleSpark extends App {
     // Inclusion Dependency Discovery (Homework)
     //------------------------------------------------------------------------------------------------------------------
 
-    val inputs = List("region", "nation", "supplier", "customer", "part", "lineitem", "orders")
-               .map(name => s"data/TPCH/tpch_$name.csv")
+    // val inputs = List("region", "nation", "supplier", "customer", "part", "lineitem", "orders")
+    val inputs = List("region", "nation")
+               .map(name => s"TPCH/tpch_$name.csv")
 
-    inputs.foreach(input =>
+    val tables = inputs.map(input =>
                             spark.read
                               .option("inferSchema", "true")
                               .option("header", "true")
                               .option("sep", ";")
                               .csv(input)
-                              .show(2,false)
-
 
     )
+
+//    create sets of attributes
+    val attribute_sets =  tables.flatMap(table =>
+                                         table.columns.map(attribute =>
+                                         table.select(functions.collect_set(table(attribute)))
+                                         ))
+
+    // TODO move to Sindy file
+// compare if the count of the attribute set is same as the outcome of a inner join between the other attributes
+// if datatypes of two columns are different, evaluate first to false to avoid exception
+    val find_uid = attribute_sets.map(attribute_set
+    => (attribute_set.columns(0),attribute_sets.map(other_attribute_sets
+      =>(other_attribute_sets.columns(0), (attribute_set.dtypes(0)._2
+          ==
+          other_attribute_sets.dtypes(0)._2)
+          &&
+          attribute_set.join(other_attribute_sets,
+          other_attribute_sets(other_attribute_sets.columns(0)) === attribute_set(attribute_set.columns(0)))
+            .count()
+          ==
+          attribute_set.count()
+      ))))
+
+    find_uid.foreach(x => print(x.toString()))
     // Read a TPCH dataset from file
 
 /*
